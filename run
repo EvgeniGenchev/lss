@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if ! [ -d "bin" ]
+then
+	mkdir "bin"
+fi
+
+gcc -o bin/lls  main.c
+chmod +x bin/lls
