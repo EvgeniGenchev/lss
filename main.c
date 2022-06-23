@@ -17,15 +17,38 @@
 #define SOCKET		6
 #define UNKNOWN		0
 
+#define COLOR_RED		"\x1b[91m"
+#define COLOR_GREEN		"\x1b[92m"
+#define COLOR_YELLOW	"\x1b[93m"
+#define COLOR_BLUE		"\x1b[94m"
+#define COLOR_MAGENTA	"\x1b[95m"
+#define COLOR_CYAN		"\x1b[96m"
+#define COLOR_RESET		"\x1b[0m"
+
+void readable_tm(struct tm *local, char* buf){
+	
+	int h, min, sec, dd, mm, yyyy;
+	
+	h = local->tm_hour;
+	min = local->tm_min;
+	sec = local->tm_sec;
+
+	dd = local->tm_mday;
+	mm = local->tm_mon + 1;
+	yyyy = local->tm_year + 1900; 
+
+	sprintf(buf, "%s%d-%02d-%02d %02d:%02d:%02d",COLOR_BLUE, yyyy, mm, dd, h, min, sec);
+}
+
 void readable_fs(double size, char* buf){
 	int i = 0;
 	const char* units[] = {"B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
 
-	while (size > 1024){
-		size /=1024;
+	while (size > 1000){
+		size /=1000;
 		i++;
 	}
-	sprintf(buf, "%.*f %s", i, size, units[i]);
+	sprintf(buf, "%.1f %s", size, units[i]);
 	return;
 }
 
@@ -34,6 +57,7 @@ void _ls(const char *dir){
 	struct dirent *d;
 	struct stat buf;
 	char fsize[10];
+	char ftime[24];
 	
 	DIR *dh = opendir(dir);
 
@@ -45,19 +69,20 @@ void _ls(const char *dir){
 		}
 		exit(EXIT_FAILURE);
 	}
-
+	
+	printf("---------------  -------------------   	 -------\n");
 	while ((d = readdir(dh)) != NULL){
 		if ( !strcmp(d->d_name,".") || !strcmp(d->d_name,"..")) continue;
 
-		if(stat(d->d_name, &buf) < 0) {
-			perror("stat");
-			exit(EXIT_FAILURE);
-		}
+		stat(d->d_name, &buf);
 		
 		readable_fs((long double) buf.st_size, fsize);
+		readable_tm(localtime(&buf.st_mtime), ftime);
 
-		printf("%s\t %.24s\t %s bytes \n", d->d_name, ctime(&buf.st_mtime), fsize);
+		printf("%-10s\t %s \t%s %5s %s\n", 
+				d->d_name, ftime ,COLOR_YELLOW, fsize, COLOR_RESET);
 	}
+	printf("---------------  -------------------   	 -------\n");
 }
 
 int main(int argc, const char *argv[]){
@@ -65,7 +90,6 @@ int main(int argc, const char *argv[]){
 	/*TODO: store different types of files in different arrays*/
 	/*TODO: sort all arrays */
 	/*TODO: make colored output */
-	/*TODO: human readable bytes */
 	/*TODO: file separet*/
 	
 	switch (argc){

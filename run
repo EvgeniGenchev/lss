@@ -7,3 +7,10 @@ fi
 
 gcc -o bin/lls  main.c
 chmod +x bin/lls
+
+if [ "$1" == "" ]
+then
+	./bin/lls
+else 
+	./bin/lls "$1"
+fi
