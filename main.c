@@ -15,43 +15,50 @@
 #define COLOR_DATE		"#83a598"
 #define COLOR_SIZE		"#fabd2f"
 #define COLOR_REG		"#ebdbb2"
-#define COLOR_LNK		"#b57614"
+#define COLOR_LNK		"#076678"
 #define COLOR_FIFO		"#98971a"
 #define COLOR_SOCK		"#a89984"
 #define COLOR_BLK		"#b16286"
 #define COLOR_CHR		"#FCFFF0"
 #define COLOR_SH		"#AFFFFF"
 
-#define COLOR_TXT		"#B280FF"
-#define COLOR_CODE		"#6666FF"
+#define COLOR_TXT		"#9D0006"
+#define COLOR_CODE		"#B57614"
 #define COLOR_MEDIA		"#EABFFF"
 #define COLOR_CONF		"#835194"
 
-#define TXT_ARR_LEN		3
-#define MEDIA_ARR_LEN	7
-#define CONF_ARR_LEN	3
-#define CODE_ARR_LEN	7
-
 #define FORMAT			"%s%d-%02d-%02d %02d:%02d:%02d"
+#define ARRAY_SIZE(x)	( sizeof(x) / sizeof((x)[0]) )
 
-char* TXT_ARRAY[] =		{".txt", ".log", ".csv"};
+char* TXT_ARRAY[] =		{".txt", ".log", ".csv", ".md"};
 char* MEDIA_ARRAY[] =	{".img", ".png", ".jpg", ".mp3", ".mp4", ".m4v", ".MOV"};
 char* CONF_ARRAY[] =	{".yml", ".json", ".toml"};
 char* CODE_ARRAY[] =	{".c", ".py", ".lua", ".cpp", ".h", ".hpp", ".js"};
 
+const int TXT_ARR_LEN =		ARRAY_SIZE(TXT_ARRAY);
+const int MEDIA_ARR_LEN =	ARRAY_SIZE(MEDIA_ARRAY);
+const int CONF_ARR_LEN =	ARRAY_SIZE(CONF_ARRAY);
+const int CODE_ARR_LEN =	ARRAY_SIZE(CODE_ARRAY);
+
 unsigned long max=0;
 
+
 int typeChecker(char* str, char* typeArray[], int arrayLen){
+
+	int strLength = strlen(str);
+
 	for(int i=0; i < arrayLen; i++){
 		int len = strlen(typeArray[i]);
 
 		//check if the string ends with the current string
-		if(strcmp(str + strlen(str) - len, typeArray[i])==0){
+		//if(strcmp(str + strlen(str) - len, typeArray[i])==0){
+        if(strLength >= len && strcmp(str + strLength - len, typeArray[i])==0){
 			return 1;
 		}
 	}
 	return 0;
 }
+
 
 void print_colored (char* str, char* color){
 	unsigned int r,g,b;
@@ -169,12 +176,13 @@ int compare_entries(const struct dirent **a, const struct dirent **b) {
 }
 
 
-void _ls(const char *dirPath){
+void _ls(){
 
+	const char *dirPath = ".";
 	DIR *dir = opendir(dirPath);
+	
 	char fsize[12];
 	char ftime[24];
-	char path[200];
 
 	if(!dir){
 		if (errno == ENOENT){
@@ -206,9 +214,7 @@ void _ls(const char *dirPath){
 		if (strcmp(entries[i]->d_name, ".") == 0
 			|| strcmp(entries[i]->d_name, "..") == 0) continue;
 		
-		sprintf(path, "%s/%s", dirPath, entries[i]->d_name);
-
-		if(stat(path, &st) < 0){
+		if(stat(entries[i]->d_name, &st) < 0){
 			printf("%s", entries[i]->d_name);
 			
 			for(int j=0; j < (int)(max - strlen(entries[i]->d_name)); j++){
@@ -299,9 +305,16 @@ int main(int argc, char **argv) {
 		case 1:
 			_ls(".");
 			break;
+
 		case 2:
-			_ls(argv[1]);
+
+			if(chdir(argv[1]) != 0){
+				perror("chdir error");
+				return 1;
+			}
+			_ls(".");
 			break;
+
 		default:
 			break;
 	}
