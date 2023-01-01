@@ -303,7 +303,7 @@ void _ls(){
 int main(int argc, char **argv) {
 	switch (argc){
 		case 1:
-			_ls(".");
+			_ls();
 			break;
 
 		case 2:
@@ -312,7 +312,7 @@ int main(int argc, char **argv) {
 				perror("chdir error");
 				return 1;
 			}
-			_ls(".");
+			_ls();
 			break;
 
 		default:
