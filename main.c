@@ -32,10 +32,10 @@
 #define FORMAT			"%s%d-%02d-%02d %02d:%02d:%02d"
 #define ARRAY_SIZE(x)	( sizeof(x) / sizeof((x)[0]) )
 
-char* TXT_ARRAY[] =		{".txt", ".log", ".csv", ".md"};
-char* MEDIA_ARRAY[] =	{".img", ".png", ".jpg", ".mp3", ".mp4", ".m4v", ".MOV"};
-char* CONF_ARRAY[] =	{".yml", ".json", ".toml"};
-char* CODE_ARRAY[] =	{".c", ".py", ".lua", ".cpp", ".h", ".hpp", ".js"};
+const char* TXT_ARRAY[] =	{".txt", ".log", ".csv", ".md"};
+const char* MEDIA_ARRAY[] =	{".img", ".png", ".jpg", ".mp3", ".mp4", ".m4v", ".MOV"};
+const char* CONF_ARRAY[] =	{".yml", ".json", ".toml"};
+const char* CODE_ARRAY[] =	{".c", ".py", ".lua", ".cpp", ".h", ".hpp", ".js"};
 
 const int TXT_ARR_LEN =		ARRAY_SIZE(TXT_ARRAY);
 const int MEDIA_ARR_LEN =	ARRAY_SIZE(MEDIA_ARRAY);
@@ -47,7 +47,7 @@ const int EMPTY_MSG_LEN =	ARRAY_SIZE(EMPTY_MSG);
 unsigned long max=0;
 
 
-int typeChecker(char* str, char* typeArray[], int arrayLen){
+int typeChecker(char* str, const char* typeArray[], int arrayLen){
 
 	int strLength = strlen(str);
 
