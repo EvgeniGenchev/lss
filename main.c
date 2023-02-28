@@ -27,6 +27,8 @@
 #define COLOR_MEDIA		"#EABFFF"
 #define COLOR_CONF		"#835194"
 
+#define EMPTY_MSG		"There is nothing to see in here :)"
+
 #define FORMAT			"%s%d-%02d-%02d %02d:%02d:%02d"
 #define ARRAY_SIZE(x)	( sizeof(x) / sizeof((x)[0]) )
 
@@ -39,6 +41,8 @@ const int TXT_ARR_LEN =		ARRAY_SIZE(TXT_ARRAY);
 const int MEDIA_ARR_LEN =	ARRAY_SIZE(MEDIA_ARRAY);
 const int CONF_ARR_LEN =	ARRAY_SIZE(CONF_ARRAY);
 const int CODE_ARR_LEN =	ARRAY_SIZE(CODE_ARRAY);
+
+const int EMPTY_MSG_LEN =	ARRAY_SIZE(EMPTY_MSG);
 
 unsigned long max=0;
 
@@ -205,91 +209,98 @@ void _ls(){
 		return;
 	}
 
-	print_underscore((int) max);
-	printf("  ___________________   ______\n");
+	// 2 because of . and ..
+	if (num_entries == 2) {
 
-	for (int i = 0; i < num_entries; i++) {
-		struct stat st;
+		printf("%s\n", EMPTY_MSG);
 
-		if (strcmp(entries[i]->d_name, ".") == 0
-			|| strcmp(entries[i]->d_name, "..") == 0) continue;
+	}else{
+
+		print_underscore((int) max);
+		printf("  ___________________   ______\n");
+
+		for (int i = 0; i < num_entries; i++) {
+			struct stat st;
+
+			if (strcmp(entries[i]->d_name, ".") == 0
+				|| strcmp(entries[i]->d_name, "..") == 0) continue;
 		
-		if(stat(entries[i]->d_name, &st) < 0){
-			printf("%s", entries[i]->d_name);
+			if(stat(entries[i]->d_name, &st) < 0){
+				printf("%s", entries[i]->d_name);
 			
-			for(int j=0; j < (int)(max - strlen(entries[i]->d_name)); j++){
-				printf("   ");
-			}
-			printf("   ???????????????????   ??????\n");
-			continue;
-		}
-
-		readable_fs((long double) st.st_size, fsize);
-		readable_tm(localtime(&st.st_mtime), ftime);
-
-		switch((S_IFMT & st.st_mode)){
-			case S_IFDIR:
-				print_colored(entries[i]->d_name, COLOR_DIR);
-				break;
-
-			case S_IFIFO:
-				print_colored(entries[i]->d_name, COLOR_FIFO);
-				break;
-
-			//TODO: IT DOES NOT WORK		
-			case S_IFLNK:
-				print_colored(entries[i]->d_name, COLOR_LNK);
-				break;
-			
-			case S_IFCHR:
-				print_colored(entries[i]->d_name, COLOR_CHR);
-				break;
-
-			case S_IFBLK:
-				print_colored(entries[i]->d_name, COLOR_BLK);
-				break;
-			
-			case S_IFSOCK:
-				print_colored(entries[i]->d_name, COLOR_SOCK);
-				break;
-
-			default:
-				if (st.st_mode & S_IXUSR){
-					print_colored(entries[i]->d_name, COLOR_SH);
+				for(int j=0; j < (int)(max - strlen(entries[i]->d_name)); j++){
+					printf("   ");
 				}
-				else{
-					if (typeChecker(entries[i]->d_name, CODE_ARRAY, CODE_ARR_LEN)){
-						print_colored(entries[i]->d_name, COLOR_CODE);
+				printf("   ???????????????????   ??????\n");
+				continue;
+			}
+
+			readable_fs((long double) st.st_size, fsize);
+			readable_tm(localtime(&st.st_mtime), ftime);
+
+			switch((S_IFMT & st.st_mode)){
+				case S_IFDIR:
+					print_colored(entries[i]->d_name, COLOR_DIR);
+					break;
+
+				case S_IFIFO:
+					print_colored(entries[i]->d_name, COLOR_FIFO);
+					break;
+
+				//TODO: IT DOES NOT WORK
+				case S_IFLNK:
+					print_colored(entries[i]->d_name, COLOR_LNK);
+					break;
+			
+				case S_IFCHR:
+					print_colored(entries[i]->d_name, COLOR_CHR);
+					break;
+
+				case S_IFBLK:
+					print_colored(entries[i]->d_name, COLOR_BLK);
+					break;
+			
+				case S_IFSOCK:
+					print_colored(entries[i]->d_name, COLOR_SOCK);
+					break;
+
+				default:
+					if (st.st_mode & S_IXUSR){
+						print_colored(entries[i]->d_name, COLOR_SH);
 					}
-					else if (typeChecker(entries[i]->d_name, TXT_ARRAY, TXT_ARR_LEN)){
-						print_colored(entries[i]->d_name, COLOR_TXT);
-					}
-					else if (typeChecker(entries[i]->d_name, MEDIA_ARRAY, MEDIA_ARR_LEN)){
-						print_colored(entries[i]->d_name, COLOR_MEDIA);
-					}
-					else if (typeChecker(entries[i]->d_name, CONF_ARRAY, CONF_ARR_LEN)){
-						print_colored(entries[i]->d_name, COLOR_CONF);
+					else{
+						if (typeChecker(entries[i]->d_name, CODE_ARRAY, CODE_ARR_LEN)){
+							print_colored(entries[i]->d_name, COLOR_CODE);
+						}
+						else if (typeChecker(entries[i]->d_name, TXT_ARRAY, TXT_ARR_LEN)){
+							print_colored(entries[i]->d_name, COLOR_TXT);
+						}
+						else if (typeChecker(entries[i]->d_name, MEDIA_ARRAY, MEDIA_ARR_LEN)){
+							print_colored(entries[i]->d_name, COLOR_MEDIA);
+						}
+						else if (typeChecker(entries[i]->d_name, CONF_ARRAY, CONF_ARR_LEN)){
+							print_colored(entries[i]->d_name, COLOR_CONF);
 					
-					}else print_colored(entries[i]->d_name, COLOR_REG);
+						}else print_colored(entries[i]->d_name, COLOR_REG);
+					}
+					break;
 				}
-				break;
 
+				for(int j=0; j < (int)(max - strlen(entries[i]->d_name)); j++){
+					printf(" ");
+				}
 
+				printf("  ");
+				print_colored(ftime, COLOR_DATE);
+				printf("   ");
+				print_colored(fsize, COLOR_SIZE);
+				printf("\n");
 			}
 
-			for(int j=0; j < (int)(max - strlen(entries[i]->d_name)); j++){
-				printf(" ");
-			}
+		print_underscore((int) max);
+		printf("  ___________________   ______\n");
 
-			printf("  ");
-			print_colored(ftime, COLOR_DATE);
-			printf("   ");
-			print_colored(fsize, COLOR_SIZE);
-			printf("\n");
-		}
-
-	print_underscore((int) max);
-	printf("  ___________________   ______\n");
+	}
 
 	// Clean up
 	for (int i = 0; i < num_entries; i++) {
