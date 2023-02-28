@@ -11,7 +11,7 @@
 
 #include "config.h"
 
-unsigned long max=0;
+unsigned long max=0; //skipcq 
 
 
 int typeChecker(char* str, const char* typeArray[], int arrayLen){
