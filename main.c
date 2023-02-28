@@ -29,7 +29,7 @@
 
 #define EMPTY_MSG		"There is nothing to see in here :)"
 
-#define FORMAT			"%s%d-%02d-%02d %02d:%02d:%02d"
+#define FORMAT			"%s%d-%02d-%02d %02d:%02d:%02d" //does nothing yet
 #define ARRAY_SIZE(x)	( sizeof(x) / sizeof((x)[0]) )
 
 const char* TXT_ARRAY[] =	{".txt", ".log", ".csv", ".md"};
@@ -76,9 +76,11 @@ void print_colored (char* str, char* color){
  *	Function: readable_fs
  *	---------------------
  *	Converts a floating number into the highest order of bytes it equals to
- *  
+ *
  *  size: a double representation of number of bytes
  *  buf: a pointer to be populated with the highest order number and its order
+ *
+ *  Discalaimer: function will work only until the size of 999.9YB 
  * */
 void readable_fs(double size, char* buf){
 	int i = 0;
@@ -88,7 +90,7 @@ void readable_fs(double size, char* buf){
 		size /=1000;
 		i++;
 	}
-	sprintf(buf, "%.1f%s", size, units[i]);
+	snprintf(buf, 8, "%.1f%s", size, units[i]);
 	return;
 }
 
@@ -113,7 +115,7 @@ void readable_tm(struct tm *local, char* buf){
 	mm = local->tm_mon + 1;
 	yyyy = local->tm_year + 1900; 
 
-	sprintf(buf, "%d-%02d-%02d %02d:%02d:%02d", yyyy, mm, dd, h, min, sec);
+	snprintf(buf, 22, "%d-%02d-%02d %02d:%02d:%02d", yyyy, mm, dd, h, min, sec);
 }
 
 
