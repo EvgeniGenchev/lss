@@ -10,9 +10,29 @@
 #include <sys/ioctl.h>
 
 #include "config.h"
+#include "lss.h"
 
-unsigned long max=0; //skipcq 
+unsigned long max=0; //skipcq
 
+static error_t parse_opt (int key, char *arg, struct argp_state *state){
+	struct arguments *arguments = state->input;
+
+	switch (key){
+		case ARGP_KEY_ARG:
+			if(chdir(arg) != 0){
+				perror("chdir error");
+				return 1;
+			}
+			state->next = state-> argc;
+			break;
+		default:
+			return ARGP_ERR_UNKNOWN;
+	}
+
+	return 0;
+}
+
+const static struct argp argp = { options, parse_opt, args_doc, doc };
 
 int typeChecker(char* str, const char* typeArray[], int arrayLen){
 
@@ -282,22 +302,11 @@ void _ls(){
 }
 
 int main(int argc, char **argv) {
-	switch (argc){
-		case 1:
-			_ls();
-			break;
+	struct arguments arguments;
+	arguments.path = ".";
 
-		case 2:
+	argp_parse (&argp, argc, argv, 0, 0, &arguments);
+	_ls();
 
-			if(chdir(argv[1]) != 0){
-				perror("chdir error");
-				return 1;
-			}
-			_ls();
-			break;
-
-		default:
-			break;
-	}
 	return 0;
 }
