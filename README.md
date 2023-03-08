@@ -14,14 +14,15 @@ It should work on any UNIX x86 system :)
   + colored file name based on type
   + date of last edit
   + size in human readable format
-+ no config file - direct customization via code
+  + support for `ls`'s `-a` and `-A` flags
++ Configurable through `config.h`
 + install script
 
 ## How to customize
 
-Similar to `suckless` software the script is contained in one file where you can customize your color palette and extend functionality.
+Similar to `suckless` software the script is contained in `cofing.h` file where you can customize your color palette and extend functionality.
 
-In order to, customize the your `lss` you need to locate the `main.c` file in the repository directory and open it with an editor of choice. There are 3 common customizations.
+In order to, customize the your `lss` you need to locate the `main.c` file in the repository directory and open it with an editor of choice. There are 4 common customizations.
 
 1. Change the color palette;
 
@@ -76,7 +77,11 @@ char * FONTS_ARRAY[] = {".ttf", '.otf', '.ps', '.woff'}
   
   ```
 
-   
+  4. Customize the output border
+  
+     ![image](https://user-images.githubusercontent.com/59848681/223764461-db9253e8-efff-4037-a13f-178005648b26.png)
+  
+     In order to, to do so you can change the definition of `BORDER_CHAR` to your desired character. There is support for non-ascii characters, however make sure you they are Monospace.:
 
 ## Install
 
