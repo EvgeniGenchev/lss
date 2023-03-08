@@ -2,11 +2,13 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <dirent.h>
+#include <locale.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <wchar.h>
 #include <sys/ioctl.h>
 
 #include "config.h"
@@ -132,11 +134,13 @@ void readable_tm(struct tm *local, char* buf){
  *	n: the number of underscores to be printed
  * */
 void print_underscore(int n){
-	char buffer[n+1];
+	int buf_size = strlen(BORDER_CHAR)*n + 1;
 
-	memset(buffer, '_', n);
+	char buffer[buf_size];
 
-	buffer[n] = '\0';
+	strcpy(buffer, "");
+
+	for (int i = 0; i < n; i++) strcat(buffer, BORDER_CHAR);
 
 	printf("%s   ", buffer);
 }
@@ -332,6 +336,8 @@ void _ls(struct arguments* arguments){
 
 int main(int argc, char **argv) {
 	struct arguments arguments;
+
+	setlocale(LC_ALL, "");
 	arguments.path = ".";
 	arguments.all = 0;
 	arguments.almost = 0;

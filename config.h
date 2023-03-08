@@ -17,6 +17,10 @@
 #define COLOR_CONF		"#835194"
 
 #define EMPTY_MSG		"There is nothing to see in here :)"
+#define BORDER_CHAR		""
+
+// must be set as string
+//#define BORDER_CHAR		"_"
 
 #define FORMAT			"%s%d-%02d-%02d %02d:%02d:%02d" //does nothing yet
 #define ARRAY_SIZE(x)	( sizeof(x) / sizeof((x)[0]) )
