@@ -134,7 +134,11 @@ void readable_tm(struct tm *local, char* buf){
  *	n: the number of underscores to be printed
  * */
 void print_underscore(int n){
-	int buf_size = strlen(BORDER_CHAR)*n + 1;
+
+	int char_size = strlen(BORDER_CHAR);
+	if (char_size == 0) return;
+
+	int buf_size = char_size*n + 1;
 
 	char buffer[buf_size];
 
