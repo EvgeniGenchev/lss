@@ -12,12 +12,19 @@
 #include "config.h"
 #include "lss.h"
 
-unsigned long max=0; //skipcq
+static unsigned long max=0; //skipcq
 
 static error_t parse_opt (int key, char *arg, struct argp_state *state){
 	struct arguments *arguments = state->input;
 
 	switch (key){
+		case 'a':
+			arguments->all = 1;
+			arguments->almost = 1;
+			break;
+		case 'A':
+			arguments->almost = 1;
+			break;
 		case ARGP_KEY_ARG:
 			if(chdir(arg) != 0){
 				perror("chdir error");
@@ -51,6 +58,16 @@ int typeChecker(char* str, const char* typeArray[], int arrayLen){
 }
 
 
+/*
+ *	Function: print_colored
+ *	---------------------
+ *	Prints a given string colored in the provided hex value
+ *
+ *  str: the character array that is to be printed 
+ *  color: the hex representation of the color that is to be used 
+ *		   for the colored output
+ *
+ * */
 void print_colored (char* str, char* color){
 	unsigned int r,g,b;
 	sscanf(color, "#%2x%2x%2x", &r, &g, &b);
@@ -78,7 +95,7 @@ void readable_fs(double size, char* buf){
 		i++;
 	}
 
-	snprintf(buf, 8, "%.1f%*s", size, (int) strlen(units[i]), units[i]);
+	snprintf(buf, H_FSIZE_LEN, "%.1f%*s", size, (int) strlen(units[i]), units[i]);
 	return;
 }
 
@@ -103,7 +120,7 @@ void readable_tm(struct tm *local, char* buf){
 	mm = local->tm_mon + 1;
 	yyyy = local->tm_year + 1900; 
 
-	snprintf(buf, 22, "%d-%02d-%02d %02d:%02d:%02d", yyyy, mm, dd, h, min, sec);
+	snprintf(buf, H_FTIME_LEN, "%d-%02d-%02d %02d:%02d:%02d", yyyy, mm, dd, h, min, sec);
 }
 
 
@@ -121,7 +138,7 @@ void print_underscore(int n){
 
 	buffer[n] = '\0';
 
-	printf("%s", buffer);
+	printf("%s   ", buffer);
 }
 
 /*
@@ -170,7 +187,7 @@ int compare_entries(const struct dirent **a, const struct dirent **b) {
 }
 
 
-void _ls(){
+void _ls(struct arguments* arguments){
 
 	const char *dirPath = ".";
 	DIR *dir = opendir(dirPath);
@@ -201,20 +218,30 @@ void _ls(){
 
 	// 2 because of . and ..
 	if (num_entries == 2) {
-
 		printf("%s\n", EMPTY_MSG);
 
 	}else{
 
 		print_underscore((int) max);
-		printf("  ___________________   ______\n");
+		print_underscore((int) H_FTIME_LEN - 1);
+		print_underscore((int) H_FSIZE_LEN);
+		printf("\n");
 
 		for (int i = 0; i < num_entries; i++) {
 			struct stat st;
 
-			if (strcmp(entries[i]->d_name, ".") == 0
-				|| strcmp(entries[i]->d_name, "..") == 0) continue;
-		
+
+			if (!arguments->almost){
+				if( (int) entries[i]->d_name[0] == (int) '.' ) continue;
+			}
+
+			if (!arguments->all){
+				if (strcmp(entries[i]->d_name, ".") == 0
+					|| strcmp(entries[i]->d_name, "..") == 0) continue;
+			}
+
+
+			// Checks if stats about a file/dir can be obtained
 			if(stat(entries[i]->d_name, &st) < 0){
 				printf("%s", entries[i]->d_name);
 			
@@ -280,7 +307,7 @@ void _ls(){
 					printf(" ");
 				}
 
-				printf("  ");
+				printf("   ");
 				print_colored(ftime, COLOR_DATE);
 				printf("   ");
 				print_colored(fsize, COLOR_SIZE);
@@ -288,7 +315,9 @@ void _ls(){
 			}
 
 		print_underscore((int) max);
-		printf("  ___________________   ______\n");
+		print_underscore((int) H_FTIME_LEN - 1);
+		print_underscore((int) H_FSIZE_LEN);
+		printf("\n");
 
 	}
 
@@ -304,9 +333,11 @@ void _ls(){
 int main(int argc, char **argv) {
 	struct arguments arguments;
 	arguments.path = ".";
+	arguments.all = 0;
+	arguments.almost = 0;
 
 	argp_parse (&argp, argc, argv, 0, 0, &arguments);
-	_ls();
+	_ls(&arguments);
 
 	return 0;
 }
